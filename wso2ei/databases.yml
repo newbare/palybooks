@@ -3,17 +3,52 @@
     hosts: wso2-db-nodes
 
     vars:
-        db_wso2_user:            "WSO2_USER_DB"
-        db_wso2_registry:        "REGISTRY_DB"
-        db_wso2_registry_local1: "REGISTRY_LOCAL1"
+        db_password:                    "wso2carbon"
+        db_user:                        "wso2"
+        db_wso2_user_schema:            "WSO2_USER_DB"
+        db_wso2_registry_schema:        "REGISTRY_DB"
+        db_wso2_registry_local1_schema: "REGISTRY_LOCAL1"
         wso2ei_home: "/usr/local/wso2/wso2ei"
+        wso2ei_script: "{{ wso2ei_home }}/dbscripts/mysql.sql"
 
     tasks:
-      - name: Create USER database {{ db_wso2_user_db }}
+      - name: "Create databases {{ item }}"
         mysql_db:
             name: "{{ item }}"
             state: present
         with_items:
-            - "{{ db_wso2_user }}"
-            - "{{ db_wso2_registry }}"
-            - "{{ db_wso2_registry_local1 }}"
+            - "{{ db_wso2_user_schema }}"
+            - "{{ db_wso2_registry_schema }}"
+            - "{{ db_wso2_registry_local1_schema }}"
+        register: db_schemas_created
+
+      - name: "Create database user {{ db_user }}"
+        mysql_user:
+            name: "{{ db_user }}"
+            password: "{{ db_password }}"
+            priv: '{{ db_wso2_user_schema }}.*:ALL,GRANT/{{ db_wso2_registry_schema }}.*:ALL,GRANT/{{ db_wso2_registry_local1_schema }}.*:ALL,GRANT'
+            host: "%"
+            append_privs: yes
+            state: present
+
+      - name: "Create Tables {{ db_wso2_user_schema }} "
+        mysql_db:
+            name: "{{ db_wso2_user_schema }}"
+            target: "{{ wso2ei_script }}"
+            state: import
+        when: db_schemas_created.changed
+
+      - name: "Create Tables {{ db_wso2_registry_schema }} "
+        mysql_db:
+            name: "{{ db_wso2_registry_schema }}"
+            target: "{{ wso2ei_script }}"
+            state: import
+        when: db_schemas_created.changed
+
+      - name: "Create Tables {{ db_wso2_registry_local1_schema }} "
+        mysql_db:
+            name: "{{ db_wso2_registry_local1_schema }}"
+            target: "{{ wso2ei_script }}"
+            state: import
+        when: db_schemas_created.changed
+

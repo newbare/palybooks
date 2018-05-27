@@ -1,4 +1,4 @@
 #!/bin/bash 
 
-ansible-playbook main.yml --connection=local
+ansible-playbook $1 --connection=local
 

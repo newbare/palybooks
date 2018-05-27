@@ -3,10 +3,9 @@
     hosts: wso2-esb-nodes
 
     vars:
+        db_wso2_user_db: "WSO2_USER_DB"
         java_base: "/usr/lib/jvm/jdk1.8.0_131/"
-        JAVA_HOME: "{{ java_base }}"
-        jdbc_dir_source: "/home/fran/Descargas/"
-        jdbc_jar: "mysql-connector-java-5.1.44-bin.jar"
+        jdbc_jar: "/home/fran/Descargas/mysql-connector-java-5.1.44-bin.jar"
         wso2ei_home: "/usr/local/wso2/wso2ei"
         wso2ei_product: "wso2ei-6.2.0"
         wso2ei_product_timestamp: "{{ wso2ei_product }}.1526903394194"
@@ -14,27 +13,39 @@
         wso2ei_source: "/home/fran/.wum-wso2/products/wso2ei/6.2.0/"
 
     tasks:
-      - name: Check if WSO2_HOME exists
+      - name: Check if WSO2_PRODUCT exists
         stat: path="{{ wso2ei_root }}/{{ wso2ei_product }}/bin/integrator.sh"
+        register: wso2ei_product_exists
+
+      - name: Check if WSO2_HOME exists
+        stat: path="{{ wso2ei_home }}/bin/integrator.sh"
         register: wso2ei_exists
 
       - name: Copy zip to destination
         copy:
             src: "{{ wso2ei_source }}/{{ wso2ei_product_timestamp }}.zip"
             dest: "{{ wso2ei_root }}"
-        when: not wso2ei_exists.stat.exists
+        when: not wso2ei_product_exists.stat.exists
 
       - name: Unzip package
         unarchive:
             src:  "{{ wso2ei_root }}/{{ wso2ei_product_timestamp }}.zip"
             dest: "{{ wso2ei_root }}"
-        when: not wso2ei_exists.stat.exists
+        when: not wso2ei_product_exists.stat.exists
 
       - name: Create WSO2_HOME
         shell: "ln -s {{ wso2ei_root }}/{{ wso2ei_product }} {{ wso2ei_home }}"
+        when: not wso2ei_exists.stat.exists
 
-      - name: Copy JDBC driver
+      - name: "Copy JDBC driver {{ jdbc_jar }}"
         copy:
-            src: "{{ jdbc_dir_source }}/{{ jdbc_jar }}"
+            src: "{{ jdbc_jar }}"
             dest: "{{ wso2ei_home }}/lib/"
+
+# Configure {{wso2ei_home}}/conf/datasources/master-datasources.xml
+# Configure {{wso2ei_home}}/conf/user-mgt.xml
+# Configure {{wso2ei_home}}/conf/axis2/axis2.xml
+# Configure {{wso2ei_home}}/conf/carbon.xml
+# Configure Hazelcast properties
+# Deploying artifacts with rsync
 
