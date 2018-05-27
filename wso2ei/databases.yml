@@ -1,0 +1,19 @@
+---
+  - name: Install WSO2 EI BBDD
+    hosts: wso2-db-nodes
+
+    vars:
+        db_wso2_user:            "WSO2_USER_DB"
+        db_wso2_registry:        "REGISTRY_DB"
+        db_wso2_registry_local1: "REGISTRY_LOCAL1"
+        wso2ei_home: "/usr/local/wso2/wso2ei"
+
+    tasks:
+      - name: Create USER database {{ db_wso2_user_db }}
+        mysql_db:
+            name: "{{ item }}"
+            state: present
+        with_items:
+            - "{{ db_wso2_user }}"
+            - "{{ db_wso2_registry }}"
+            - "{{ db_wso2_registry_local1 }}"
