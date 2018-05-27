@@ -1,0 +1,40 @@
+---
+  - name: Install WSO2 EI
+    hosts: wso2-esb-nodes
+
+    vars:
+        java_base: "/usr/lib/jvm/jdk1.8.0_131/"
+        JAVA_HOME: "{{ java_base }}"
+        jdbc_dir_source: "/home/fran/Descargas/"
+        jdbc_jar: "mysql-connector-java-5.1.44-bin.jar"
+        wso2ei_home: "/usr/local/wso2/wso2ei"
+        wso2ei_product: "wso2ei-6.2.0"
+        wso2ei_product_timestamp: "{{ wso2ei_product }}.1526903394194"
+        wso2ei_root: "/usr/local/wso2/"
+        wso2ei_source: "/home/fran/.wum-wso2/products/wso2ei/6.2.0/"
+
+    tasks:
+      - name: Check if WSO2_HOME exists
+        stat: path="{{ wso2ei_root }}/{{ wso2ei_product }}/bin/integrator.sh"
+        register: wso2ei_exists
+
+      - name: Copy zip to destination
+        copy:
+            src: "{{ wso2ei_source }}/{{ wso2ei_product_timestamp }}.zip"
+            dest: "{{ wso2ei_root }}"
+        when: not wso2ei_exists.stat.exists
+
+      - name: Unzip package
+        unarchive:
+            src:  "{{ wso2ei_root }}/{{ wso2ei_product_timestamp }}.zip"
+            dest: "{{ wso2ei_root }}"
+        when: not wso2ei_exists.stat.exists
+
+      - name: Create WSO2_HOME
+        shell: "ln -s {{ wso2ei_root }}/{{ wso2ei_product }} {{ wso2ei_home }}"
+
+      - name: Copy JDBC driver
+        copy:
+            src: "{{ jdbc_dir_source }}/{{ jdbc_jar }}"
+            dest: "{{ wso2ei_home }}/lib/"
+
