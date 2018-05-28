@@ -11,6 +11,38 @@
         wso2ei_product_timestamp: "{{ wso2ei_product }}.1526903394194"
         wso2ei_root: "/usr/local/wso2/"
         wso2ei_source: "/home/fran/.wum-wso2/products/wso2ei/6.2.0/"
+        carbon:
+            hostName: wso2b
+            mgHostName: wso2b
+            offset: 0
+        userMgt:
+            realm:
+                addAdmin:
+                    userName:
+                        password: admin
+        datasource:
+            REGISTRY_LOCAL:
+                name: REGISTRY_LOCAL1
+                jdbc: jdbc/WSO2CarbonDB
+                url: jdbc:mysql://localhost:3306/REGISTRY_LOCAL1?autoReconnect=true
+                username: wso2
+                password: wso2carbon
+                driver: com.mysql.jdbc.Driver
+            REGISTRY:
+                name: REGISTRY_DB
+                jdbc: jdbc/WSO2RegistryDB
+                url: jdbc:mysql://localhost:3306/REGISTRY_DB?autoReconnect=true
+                username: wso2
+                password: wso2carbon
+                driver: com.mysql.jdbc.Driver
+            USER:
+                name : WSO2_USER_DB
+                jdbc: jdbc/WSO2UMDB
+                url: jdbc:mysql://localhost:3306/WSO2_USER_DB?autoReconnect=true
+                username: wso2
+                password: wso2carbon
+                driver: com.mysql.jdbc.Driver
+
 
     tasks:
       - name: Check if WSO2_PRODUCT exists
@@ -42,10 +74,22 @@
             src: "{{ jdbc_jar }}"
             dest: "{{ wso2ei_home }}/lib/"
 
-# Configure {{wso2ei_home}}/conf/datasources/master-datasources.xml
-# Configure {{wso2ei_home}}/conf/user-mgt.xml
+      - name: Configure carbon.xml
+        template:
+            src: templates/conf/carbon.xml.j2
+            dest: "{{ wso2ei_home }}/conf/carbon.xml"
+
+      - name: Configure user-mgt.xml
+        template:
+            src: templates/conf/user-mgt.xml.j2
+            dest: "{{ wso2ei_home }}/conf/user-mgt.xml"
+
+      - name: Configure master-datasources.xml
+        template:
+            src: templates/conf/datasources/master-datasources.xml.j2
+            dest: "{{ wso2ei_home }}/conf/datasources/master-datasources.xml"
+
 # Configure {{wso2ei_home}}/conf/axis2/axis2.xml
-# Configure {{wso2ei_home}}/conf/carbon.xml
 # Configure Hazelcast properties
 # Deploying artifacts with rsync
 
