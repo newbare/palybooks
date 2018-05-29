@@ -5,12 +5,12 @@
     vars:
         db_wso2_user_db: "WSO2_USER_DB"
         java_base: "/usr/lib/jvm/jdk1.8.0_131/"
-        jdbc_jar: "/home/fran/Descargas/mysql-connector-java-5.1.44-bin.jar"
+        jdbc_jar: "$DIR_JAR/mysql-connector-java-5.1.44-bin.jar"
         wso2ei_home: "/usr/local/wso2/wso2ei"
         wso2ei_product: "wso2ei-6.2.0"
-        wso2ei_product_timestamp: "{{ wso2ei_product }}.1526903394194"
+        wso2ei_product_timestamp: "{{ wso2ei_product }}"
         wso2ei_root: "/usr/local/wso2/"
-        wso2ei_source: "/home/fran/.wum-wso2/products/wso2ei/6.2.0/"
+        wso2ei_source: "DIR_SOURCE"
         carbon:
             hostName: wso2b
             mgHostName: wso2b
@@ -42,7 +42,17 @@
                 username: wso2
                 password: wso2carbon
                 driver: com.mysql.jdbc.Driver
-
+        axis2:
+            clustering:
+                enable: false
+                membershipScheme: wka
+                domain: wso2.carbon.domain
+                localMemberHost: 127.0.0.1
+                localMemberPort: 4100
+            http:
+                WSDLEPRPrefix: http://wso2b:8280
+            https:
+                WSDLEPRPrefix: http://wso2b:8280
 
     tasks:
       - name: Check if WSO2_PRODUCT exists
@@ -89,7 +99,19 @@
             src: templates/conf/datasources/master-datasources.xml.j2
             dest: "{{ wso2ei_home }}/conf/datasources/master-datasources.xml"
 
-# Configure {{wso2ei_home}}/conf/axis2/axis2.xml
-# Configure Hazelcast properties
-# Deploying artifacts with rsync
+      - name: Configure registry.xml
+        template:
+            src: templates/conf/registry.xml.j2
+            dest: "{{ wso2ei_home }}/conf/registry.xml"
+
+      - name: Configure axis2.xml
+        template:
+            src: templates/conf/axis2/axis2.xml.j2
+            dest: "{{ wso2ei_home }}/conf/axis2/axis2.xml"
+
+      - name: Copy hazelcast.properties
+        copy:
+            src: templates/conf/hazelcast.properties
+            dest: "{{ wso2ei_home }}/conf/"
+
 

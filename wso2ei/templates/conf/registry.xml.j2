@@ -30,9 +30,13 @@
     <registryRoot>/</registryRoot>
 
     <dbConfig name="wso2registry">
-        <dataSource>jdbc/WSO2CarbonDB</dataSource>
+        <dataSource>{{ datasource.REGISTRY_LOCAL.jdbc }}</dataSource>
     </dbConfig>
-    
+
+    <dbConfig name="sharedregistry">
+        <dataSource>{{ datasource.REGISTRY.jdbc }}</dataSource>
+    </dbConfig> 
+
     <indexingConfiguration>
         <startIndexing>true</startIndexing>
         <startingDelayInSeconds>35</startingDelayInSeconds>
@@ -104,19 +108,24 @@
         <password>password</password>
     </remoteInstance-->
 
-    <!--remoteInstance url="https://localhost:9443/registry">
+    <remoteInstance url="https://localhost:9443/registry">
         <id>instanceid</id>
-        <dbConfig>wso2registry</dbConfig>
+        <dbConfig>sharedregistry</dbConfig>
         <readOnly>false</readOnly>
         <enableCache>true</enableCache>
         <registryRoot>/</registryRoot>
-    </remoteInstance-->
+        <cacheId>{{ datasource.REGISTRY.username }}@{{ datasource.REGISTRY.url }}</cacheId>
+    </remoteInstance>
 
-    <!--mount path="/_system/config" overwrite="true|false|virtual">
+    <mount path="/_system/config" overwrite="true">
         <instanceId>instanceid</instanceId>
-        <targetPath>/_system/nodes</targetPath>
-    </mount-->
+        <targetPath>/_system/eiconfig</targetPath>
+    </mount>
 
+    <mount path="/_system/governance" overwrite="true">
+        <instanceId>instanceid</instanceId>
+        <targetPath>/_system/governance</targetPath>
+    </mount>
     
     <versionResourcesOnChange>false</versionResourcesOnChange>
 
@@ -129,3 +138,4 @@
         <versioningRatings>true</versioningRatings>
     </staticConfiguration>
 </wso2registry>
+

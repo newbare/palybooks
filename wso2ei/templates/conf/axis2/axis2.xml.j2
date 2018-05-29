@@ -246,7 +246,7 @@
         <parameter name="port" locked="false">8280</parameter>
         <parameter name="non-blocking" locked="false">true</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
-        <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
+        <parameter name="WSDLEPRPrefix" locked="false">{{ axis2.http.WSDLEPRPrefix }}</parameter>
         <parameter name="httpGetProcessor" locked="false">org.wso2.carbon.mediation.transport.handlers.PassThroughNHttpGetProcessor</parameter>
         <!--<parameter name="priorityConfigFile" locked="false">location of priority configuration file</parameter>-->
     </transportReceiver>
@@ -256,7 +256,7 @@
         <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="HttpsProtocols">TLSv1,TLSv1.1,TLSv1.2</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
-        <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
+        <parameter name="WSDLEPRPrefix" locked="false">{{ axis2.https.WSDLEPRPrefix }}</parameter>
         <parameter name="httpGetProcessor" locked="false">org.wso2.carbon.mediation.transport.handlers.PassThroughNHttpGetProcessor</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
@@ -491,8 +491,7 @@
      corresponding to the "class" attribute of the "clustering" element. It is also responsible for
      getting this node to join the cluster.
      -->
-    <clustering class="org.wso2.carbon.core.clustering.hazelcast.HazelcastClusteringAgent"
-                enable="false">
+    <clustering class="org.wso2.carbon.core.clustering.hazelcast.HazelcastClusteringAgent" enable="{{ axis2.clustering.enable }}">
 
         <!-- Parameter to differentiate clustering mode, Default value will be "nonWorkerManager" in which
          case the all nodes of the cluster run schedule tasks-->
@@ -518,7 +517,8 @@
                     is deemed to have left the cluster, it will be detected by the Group Membership
                     Service (GMS) using a TCP ping mechanism.
         -->
-        <parameter name="membershipScheme">wka</parameter>
+
+        <parameter name="membershipScheme">{{ axis2.clustering.membershipScheme }}</parameter>
         <!--<parameter name="licenseKey">xxx</parameter>-->
         <!--<parameter name="mgtCenterURL">http://localhost:8081/mancenter/</parameter>-->
 
@@ -526,7 +526,7 @@
          The clustering domain/group. Nodes in the same group will belong to the same multicast
          domain. There will not be interference between nodes in different groups.
         -->
-        <parameter name="domain">wso2.carbon.domain</parameter>
+        <parameter name="domain">{{ axis2.clustering.domain }}</parameter>
 
         <!-- The multicast address to be used -->
         <!--<parameter name="mcastAddress">228.0.0.4</parameter>-->
@@ -547,7 +547,7 @@
         -->
         <!-- The host name or IP address of this member -->
 
-        <parameter name="localMemberHost">127.0.0.1</parameter>
+        <parameter name="localMemberHost">{{ axis2.clustering.localMemberHost }}</parameter>
 
         <!--
             The bind adress of this member. The difference between localMemberHost & localMemberBindAddress
@@ -562,7 +562,7 @@
         The TCP port used by this member. This is the port through which other nodes will
         contact this member
          -->
-        <parameter name="localMemberPort">4100</parameter>
+        <parameter name="localMemberPort">{{ axis2.clustering.localMemberPort }}</parameter>
 
         <!--
             The bind port of this member. The difference between localMemberPort & localMemberBindPort
